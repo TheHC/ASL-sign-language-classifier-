@@ -39,6 +39,7 @@ train_labels=labels[0:int(0.7*len(features_add))]
 val_add=features_add[int(0.7*len(features_add)):int(0.9*len(features_add))]
 val_labels=labels[int(0.7*len(features_add)):int(0.9*len(features_add))]
 
+
 test_add=features_add[int(0.9*len(features_add)):]
 test_labels=labels[int(0.9*len(features_add)):]
 
@@ -61,7 +62,7 @@ def _bytes_feature(value):
     #convert value to bytes using tf.train.BytesList and creature a feature using tf.train.Feature
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-def TFrecord_write(features_add,labes, name):
+def TFrecord_write(features_add,labels, name):
     # data->FeatureSet->Example protocol-> Serialized Example -> tfRecord
     with tf.python_io.TFRecordWriter("TFrecords/"+name+".tfrecords") as writer: # the TFwriter writer
         print("writing the "+name+" TFrecord")
