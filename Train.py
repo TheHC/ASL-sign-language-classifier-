@@ -13,7 +13,6 @@ epochs= 5
 keep_probability=0.5
 
 
-
 classes_names = []
 dataset_file = glob.glob("dataset/asl_alphabet_train/*")
 
@@ -130,14 +129,14 @@ def model_fn(X, keep_prob):
 tf.reset_default_graph()
 
 # place holdes for features, labels and keep_prob
-x=tf.placeholder(tf.float32, [None, img_size, img_size, 3] , name="x")
-y=tf.placeholder(tf.int64, [None, num_classes], name="y")
-keep_prob=tf.placeholder(tf.float32, name="keep_prob")
+x=tf.placeholder(tf.float32, [None, img_size, img_size, 3] , name='x')
+y=tf.placeholder(tf.int64, [None, num_classes], name='y')
+keep_prob=tf.placeholder(tf.float32, name='keep_prob')
 
 
 
 #log
-logits= tf.identity(model_fn(x,keep_prob) , name="logits")
+logits= tf.identity(model_fn(x,keep_prob) , name='logits')
 
 # loss=
 loss=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels=y, logits=logits))
@@ -147,7 +146,7 @@ optimizer=tf.train.AdamOptimizer(learning_rate=0.0001).minimize(loss)
 
 #Accuracy
 pred=tf.equal(tf.argmax(logits,1),tf.argmax(y,1))
-accuracy=tf.reduce_mean(tf.cast(pred,tf.float32), name="accuracy")
+accuracy=tf.reduce_mean(tf.cast(pred,tf.float32), name='accuracy')
 
 
 train_dataset= train_input_fn()
