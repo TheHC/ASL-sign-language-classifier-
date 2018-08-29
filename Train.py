@@ -1,15 +1,16 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.tools import freeze_graph
 import cv2
 from PIL import Image
 import glob
 import sys
 import math
 
-train_batch_size =128
-valid_batch_size=128
+train_batch_size =32
+valid_batch_size=32
 img_size = 100
-epochs= 5
+epochs= 1
 keep_probability=0.5
 
 
@@ -110,18 +111,18 @@ def model_fn(X, keep_prob):
     #FC layers
 
     dense1=tf.layers.dense(flat_layer, 4096, activation=tf.nn.relu)
-    dense1=tf.nn.dropout(dense1, keep_prob)
+    #dense1=tf.nn.dropout(dense1, keep_prob)
 
     dense2=tf.layers.dense(dense1, 4096, activation=tf.nn.relu)
-    dense2=tf.nn.dropout(dense2, keep_prob)
+    #dense2=tf.nn.dropout(dense2, keep_prob)
 
     # dense3=tf.layers.dense(dense2, num_classes, activation=tf.nn.relu)
     # output=tf.nn.dropout(dense3, keep_prob)
     #
     #
     # output layer
-    output=tf.layers.dense(dense2, num_classes)
-    return output
+    #output=tf.layers.dense(dense2, num_classes, name='logits')
+    return dense2
 
 
 
@@ -136,10 +137,13 @@ keep_prob=tf.placeholder(tf.float32, name='keep_prob')
 
 
 #log
-logits= tf.identity(model_fn(x,keep_prob) , name='logits')
+logits= tf.layers.dense(model_fn(x,keep_prob), num_classes, name="logits") 
+
+#softmax
+softmax=tf.identity(tf.nn.softmax_cross_entropy_with_logits( labels=y, logits=logits), name='softmax')
 
 # loss=
-loss=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels=y, logits=logits))
+loss=tf.reduce_mean(softmax)
 
 #optimizer
 optimizer=tf.train.AdamOptimizer(learning_rate=0.0001).minimize(loss)
@@ -158,7 +162,7 @@ valid_iterator=valid_dataset.make_initializable_iterator()
 valid_features, valid_labels=valid_iterator.get_next()
 
 
-save_model_path="Model/model0/"
+save_model_path="Model/model0/model.ckpt"
 
 
 
@@ -192,4 +196,12 @@ with tf.Session() as sess:
 
     saver=tf.train.Saver()
     saver_path=saver.save(sess,save_model_path)
+    graph_def=sess.graph.as_graph_def()	
+    #for node in graph_def.node:
+    #	print(node.name)
+    tf.train.write_graph(graph_def,'./Model/model0/','graph.pbtxt',as_text=True)
+    freeze_graph.freeze_graph('./Model/model0/graph.pbtxt', "", False,'./Model/model0/model.ckpt', "logits/BiasAdd",
+                              "save/restore_all", "save/Const:0",
+                              './Model/model0/frozen_model.pb', True, ""
+                              )
 
