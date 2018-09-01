@@ -10,7 +10,7 @@ import math
 train_batch_size =32
 valid_batch_size=32
 img_size = 100
-epochs= 1
+epochs= 5
 keep_probability=0.5
 
 
@@ -84,6 +84,7 @@ def conv_layer_max2pool(Input, num_output_channels, conv_filter_size,conv_stride
     return conv
 
 def model_fn(X, keep_prob):
+    #X = tf.transpose(X, [0, 3, 1, 2])
 
     conv1=conv_layer_max2pool(X,num_output_channels=96, conv_filter_size=(11,11), conv_strides=4, pool_filter_size=(3,3), pool_strides=2)
 
@@ -92,17 +93,7 @@ def model_fn(X, keep_prob):
     conv3=conv_layer_max2pool(conv2,num_output_channels=384, conv_filter_size=(3,3), conv_strides=1, pool_filter_size=(2,2), pool_strides=2, POOL=False)
     conv4=conv_layer_max2pool(conv3,num_output_channels=384, conv_filter_size=(3,3), conv_strides=1, pool_filter_size=(2,2), pool_strides=2, POOL=False)
     conv5=conv_layer_max2pool(conv4,num_output_channels=256, conv_filter_size=(3,3), conv_strides=1, pool_filter_size=(3,3), pool_strides=2)
-
-
-
-
-    #conv2= tf.nn.dropout(conv5, keep_prob)
-
-    # conv3 = conv_layer_max2pool(conv2, num_output_channels=128, conv_filter_size=(3, 3), conv_strides=2,
-    #                             pool_filter_size=(2, 2), pool_strides=2)
-    #
-    # conv4 = conv_layer_max2pool(conv3, num_output_channels=128, conv_filter_size=(2, 2), conv_strides=2,
-    #                             pool_filter_size=(2, 2), pool_strides=2)
+ 
 
 
 
@@ -116,12 +107,7 @@ def model_fn(X, keep_prob):
     dense2=tf.layers.dense(dense1, 4096, activation=tf.nn.relu)
     #dense2=tf.nn.dropout(dense2, keep_prob)
 
-    # dense3=tf.layers.dense(dense2, num_classes, activation=tf.nn.relu)
-    # output=tf.nn.dropout(dense3, keep_prob)
-    #
-    #
-    # output layer
-    #output=tf.layers.dense(dense2, num_classes, name='logits')
+   
     return dense2
 
 
@@ -130,7 +116,8 @@ def model_fn(X, keep_prob):
 tf.reset_default_graph()
 
 # place holdes for features, labels and keep_prob
-x=tf.placeholder(tf.float32, [None, img_size, img_size, 3] , name='x')
+
+x=tf.placeholder(tf.float32, [None,  img_size, img_size, 3] , name='x')
 y=tf.placeholder(tf.int64, [None, num_classes], name='y')
 keep_prob=tf.placeholder(tf.float32, name='keep_prob')
 
