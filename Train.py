@@ -84,7 +84,7 @@ def conv_layer_max2pool(Input, num_output_channels, conv_filter_size,conv_stride
     return conv
 
 def model_fn(X, keep_prob):
-    #X = tf.transpose(X, [0, 3, 1, 2])
+    X = tf.transpose(X, [0, 2, 3, 1])
 
     conv1=conv_layer_max2pool(X,num_output_channels=96, conv_filter_size=(11,11), conv_strides=4, pool_filter_size=(3,3), pool_strides=2)
 
@@ -117,7 +117,10 @@ tf.reset_default_graph()
 
 # place holdes for features, labels and keep_prob
 
-x=tf.placeholder(tf.float32, [None,  img_size, img_size, 3] , name='x')
+#x=tf.placeholder(tf.float32, [None,  img_size, img_size, 3] , name='x')
+x=tf.placeholder(tf.float32, [None, 3, img_size, img_size] , name='x')
+
+
 y=tf.placeholder(tf.int64, [None, num_classes], name='y')
 keep_prob=tf.placeholder(tf.float32, name='keep_prob')
 
@@ -161,6 +164,7 @@ with tf.Session() as sess:
         while True  :
             try:
                 img_batch, label_batch= sess.run([features,labels])
+                img_batch=np.transpose(img_batch,(0,3,1,2))
                 sess.run(optimizer, feed_dict={x: img_batch, y: label_batch, keep_prob: keep_probability})
             except tf.errors.OutOfRangeError:
                 print('Epoch {:>2}: '.format(epoch + 1), end='')
@@ -174,6 +178,7 @@ with tf.Session() as sess:
         while True :
             try:
                 valid_img_batch, valid_label_batch = sess.run([valid_features, valid_labels])
+                valid_img_batch = np.transpose(valid_img_batch, (0, 3, 1, 2))
                 valid_accuracy+=sess.run(accuracy, feed_dict={x: valid_img_batch, y:valid_label_batch, keep_prob:1.0})
             except  tf.errors.OutOfRangeError:
                 break
