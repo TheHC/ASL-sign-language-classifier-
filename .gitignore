@@ -1,3 +1,6 @@
 dataset
 TFrecords
 Model/*
+build/*
+TensorRT_Inference/Engine/engine.plan
+TensorRT_Inference/UFF.uff

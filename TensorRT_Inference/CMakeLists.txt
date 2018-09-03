@@ -1,0 +1,2 @@
+add_executable(UFF_to_ENGINE UFF_to_ENGINE.cpp)
+target_link_libraries(UFF_to_ENGINE nvinfer nvparsers)
