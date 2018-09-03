@@ -96,9 +96,11 @@ def model_fn(X, keep_prob):
  
 
 
-
-    flat_layer= tf.layers.flatten(conv5)
-
+    print(' The flatten shape is : {} '.format(conv5.get_shape()))
+    #flat_layer= tf.layers.flatten(conv5)
+    flat_layer = tf.reshape(conv5, shape=(-1, conv5.get_shape()[1]*conv5.get_shape()[2]*conv5.get_shape()[3]))
+    print(' The flatten shape is : {} '.format(flat_layer.get_shape()))
+    	
     #FC layers
 
     dense1=tf.layers.dense(flat_layer, 4096, activation=tf.nn.relu)
